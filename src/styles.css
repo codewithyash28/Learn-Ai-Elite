@@ -62,26 +62,36 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  /* LearnAI Elite — deep indigo galaxy with gold accents */
+  --radius: 0.875rem;
+  --background: oklch(0.16 0.04 270);
+  --foreground: oklch(0.97 0.01 270);
+  --card: oklch(0.21 0.05 270);
+  --card-foreground: oklch(0.97 0.01 270);
+  --popover: oklch(0.21 0.05 270);
+  --popover-foreground: oklch(0.97 0.01 270);
+  --primary: oklch(0.68 0.19 285);
+  --primary-foreground: oklch(0.16 0.04 270);
+  --primary-glow: oklch(0.78 0.18 295);
+  --secondary: oklch(0.28 0.06 270);
+  --secondary-foreground: oklch(0.97 0.01 270);
+  --muted: oklch(0.26 0.04 270);
+  --muted-foreground: oklch(0.72 0.04 270);
+  --accent: oklch(0.82 0.16 85);
+  --accent-foreground: oklch(0.18 0.04 270);
+  --gold: oklch(0.84 0.16 88);
+  --gold-foreground: oklch(0.18 0.04 270);
+  --streak: oklch(0.74 0.19 40);
+  --destructive: oklch(0.66 0.22 25);
+  --destructive-foreground: oklch(0.97 0.01 270);
+  --border: oklch(0.32 0.05 270 / 60%);
+  --input: oklch(0.28 0.05 270);
+  --ring: oklch(0.68 0.19 285);
+  --gradient-galaxy: radial-gradient(ellipse at top, oklch(0.32 0.12 285 / 0.6), transparent 60%), radial-gradient(ellipse at bottom right, oklch(0.32 0.14 320 / 0.4), transparent 60%), oklch(0.13 0.04 270);
+  --gradient-primary: linear-gradient(135deg, oklch(0.68 0.19 285), oklch(0.78 0.18 320));
+  --gradient-gold: linear-gradient(135deg, oklch(0.86 0.16 92), oklch(0.74 0.18 60));
+  --shadow-glow: 0 10px 40px -10px oklch(0.68 0.19 285 / 0.55);
+  --shadow-gold: 0 8px 32px -8px oklch(0.84 0.16 88 / 0.45);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -138,7 +148,52 @@
   }
 
   body {
-    background-color: var(--color-background);
+    background: var(--gradient-galaxy);
+    background-attachment: fixed;
     color: var(--color-foreground);
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
   }
 }
+
+@theme inline {
+  --color-primary-glow: var(--primary-glow);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-streak: var(--streak);
+}
+
+@layer utilities {
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-gold {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-gold { background: var(--gradient-gold); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-gold { box-shadow: var(--shadow-gold); }
+  .glass {
+    background: oklch(0.22 0.05 270 / 0.55);
+    backdrop-filter: blur(14px);
+    border: 1px solid oklch(1 0 0 / 0.06);
+  }
+}
+
+@keyframes pulse-streak {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.74 0.19 40 / 0.6); }
+  50% { box-shadow: 0 0 0 12px oklch(0.74 0.19 40 / 0); }
+}
+.animate-pulse-streak { animation: pulse-streak 2s ease-out infinite; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.animate-twinkle { animation: twinkle 3s ease-in-out infinite; }
