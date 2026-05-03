@@ -224,4 +224,3 @@ function RecentLessons() {
     </div>
   );
 }
-}
