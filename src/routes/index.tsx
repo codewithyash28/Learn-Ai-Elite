@@ -32,11 +32,19 @@ function Index() {
   return (<><Dashboard /><Toaster /></>);
 }
 
+const STARTER_GALAXY: GalaxyData = {
+  core: "Your Universe",
+  prerequisites: ["Curiosity", "A Question", "Your Notebook"],
+  forward: ["Mastery", "Creativity", "Discovery", "Confidence"],
+  interdisciplinary: ["Science", "Art", "Math", "History"],
+};
+
 function Dashboard() {
   const state = useLearnStore();
   const profile = state.profile!;
   const [topic, setTopic] = useState("");
   const [subject, setSubject] = useState(profile.subject);
+  const [activeLanguage, setActiveLanguage] = useState(profile.language);
   const [lesson, setLesson] = useState<string | null>(null);
   const [galaxy, setGalaxy] = useState<GalaxyData | null>(null);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
@@ -44,13 +52,15 @@ function Dashboard() {
   const [loadingGalaxy, setLoadingGalaxy] = useState(false);
   const [loadingForecast, setLoadingForecast] = useState(false);
 
-  async function generate() {
-    const t = topic.trim();
+  async function generate(overrideTopic?: string, overrideLang?: string) {
+    const t = (overrideTopic ?? topic).trim();
     if (!t) return;
+    const lang = overrideLang ?? activeLanguage;
+    setActiveLanguage(lang);
     setLesson(null); setGalaxy(null); setForecast(null);
     setLoadingLesson(true); setLoadingGalaxy(true); setLoadingForecast(true);
 
-    const ctx = { topic: t, subject, board: profile.board, grade: profile.grade, language: profile.language };
+    const ctx = { topic: t, subject, board: profile.board, grade: profile.grade, language: lang };
 
     callLearnAI<string>("lesson", ctx)
       .then((md) => {
@@ -68,6 +78,26 @@ function Dashboard() {
     callLearnAI<ForecastData>("forecast", { ...ctx, xp: state.xp, lessons: state.lessons.length, streak: state.streak })
       .then(setForecast).catch((e) => console.error(e))
       .finally(() => setLoadingForecast(false));
+  }
+
+  async function switchLanguage(lang: string) {
+    if (!topic.trim() && !lesson) return;
+    // Re-generate just the lesson in the new language for instant "aha" effect
+    const t = topic.trim() || (state.lessons[0]?.topic ?? "");
+    if (!t) return;
+    setActiveLanguage(lang);
+    setLoadingLesson(true);
+    try {
+      const md = await callLearnAI<string>("lesson", {
+        topic: t, subject, board: profile.board, grade: profile.grade, language: lang,
+      });
+      setLesson(md);
+      toast.success(`✨ Switched to ${lang}`);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setLoadingLesson(false);
+    }
   }
 
   return (
@@ -118,7 +148,7 @@ function Dashboard() {
                 className="h-11 flex-1"
               />
               <Button
-                onClick={generate}
+                onClick={() => generate()}
                 disabled={!topic.trim() || loadingLesson}
                 className="h-11 bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-glow font-semibold"
               >
@@ -135,19 +165,19 @@ function Dashboard() {
                 Synthesizing your personalized lesson...
               </div>
             ) : lesson ? (
-              <LessonView markdown={lesson} />
+              <LessonView markdown={lesson} currentLanguage={activeLanguage} onSwitchLanguage={switchLanguage} />
             ) : (
               <EmptyState />
             )}
           </div>
 
           {/* Galaxy */}
-          {(galaxy || loadingGalaxy) && (
-            loadingGalaxy ? (
-              <div className="rounded-2xl glass p-6 h-64 grid place-items-center text-muted-foreground">
-                <div className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Mapping the neural galaxy...</div>
-              </div>
-            ) : galaxy && <KnowledgeGalaxy data={galaxy} />
+          {loadingGalaxy ? (
+            <div className="rounded-2xl glass p-6 h-64 grid place-items-center text-muted-foreground">
+              <div className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Mapping the neural galaxy...</div>
+            </div>
+          ) : (
+            <KnowledgeGalaxy data={galaxy ?? STARTER_GALAXY} />
           )}
         </section>
 
