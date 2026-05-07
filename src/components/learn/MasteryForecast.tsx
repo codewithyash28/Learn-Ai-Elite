@@ -8,6 +8,20 @@ export type ForecastData = {
   advice: string;
 };
 
+function buildTrend(current: number, hours: number) {
+  // Predictive curve: from `current` mastery → 95% across `days` days.
+  const days = Math.max(1, Math.round(hours / 1.5)); // ~1.5h study/day
+  const points: { d: number; m: number }[] = [];
+  const target = 95;
+  for (let i = 0; i <= days; i++) {
+    // Logistic-ish ease-out from current → target
+    const t = i / days;
+    const eased = 1 - Math.pow(1 - t, 1.7);
+    points.push({ d: i, m: Math.round(current + (target - current) * eased) });
+  }
+  return { days, points };
+}
+
 export function MasteryForecast({ data, loading }: { data: ForecastData | null; loading: boolean }) {
   return (
     <div className="rounded-2xl p-5 shadow-glow relative overflow-hidden bg-gradient-to-br from-[oklch(0.28_0.09_280)] to-[oklch(0.22_0.06_270)] border border-border">
