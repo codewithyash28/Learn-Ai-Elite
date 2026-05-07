@@ -1,5 +1,9 @@
-import { motion } from "motion/react";
-import { useMemo } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { useMemo, useState } from "react";
+import { Link2, Loader2, X } from "lucide-react";
+import { callLearnAI } from "@/lib/ai";
+import { useLearnStore } from "@/lib/learn-store";
+import { toast } from "sonner";
 
 export type GalaxyData = {
   core: string;
@@ -9,6 +13,39 @@ export type GalaxyData = {
 };
 
 export function KnowledgeGalaxy({ data }: { data: GalaxyData }) {
+  const profile = useLearnStore().profile;
+  const [connectMode, setConnectMode] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [bridge, setBridge] = useState<{ title: string; insight: string; example: string } | null>(null);
+  const [loadingBridge, setLoadingBridge] = useState(false);
+
+  async function tryBridge(next: string[]) {
+    if (next.length !== 2) return;
+    setLoadingBridge(true);
+    setBridge(null);
+    try {
+      const b = await callLearnAI<{ title: string; insight: string; example: string }>("bridge", {
+        a: next[0], b: next[1],
+        board: profile?.board, grade: profile?.grade, language: profile?.language,
+      });
+      setBridge(b);
+    } catch (e: any) {
+      toast.error(e.message || "Bridge failed");
+    } finally {
+      setLoadingBridge(false);
+    }
+  }
+
+  function handleNodeClick(label: string) {
+    if (!connectMode) return;
+    setPicked((prev) => {
+      if (prev.includes(label)) return prev.filter((l) => l !== label);
+      const next = [...prev, label].slice(-2);
+      if (next.length === 2) tryBridge(next);
+      return next;
+    });
+  }
+
   const nodes = useMemo(() => {
     const W = 600, H = 420, cx = W / 2, cy = H / 2;
     const ringNodes = (arr: string[], radius: number, startAngle = 0, color: string, kind: string) =>
