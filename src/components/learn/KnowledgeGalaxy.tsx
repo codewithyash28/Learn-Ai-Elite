@@ -65,14 +65,31 @@ export function KnowledgeGalaxy({ data }: { data: GalaxyData }) {
 
   return (
     <div className="rounded-2xl glass p-4 shadow-glow overflow-hidden">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
         <h3 className="text-sm font-semibold text-gradient-primary">🌌 Neural Knowledge Galaxy</h3>
-        <div className="flex gap-3 text-[10px] uppercase tracking-wider text-muted-foreground">
-          <Legend dot="var(--color-primary)" label="Prereq" />
-          <Legend dot="var(--color-primary-glow)" label="Forward" />
-          <Legend dot="oklch(0.78 0.18 320)" label="Cross" />
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex gap-3 text-[10px] uppercase tracking-wider text-muted-foreground">
+            <Legend dot="var(--color-primary)" label="Prereq" />
+            <Legend dot="var(--color-primary-glow)" label="Forward" />
+            <Legend dot="oklch(0.78 0.18 320)" label="Cross" />
+          </div>
+          <button
+            onClick={() => { setConnectMode((v) => !v); setPicked([]); setBridge(null); }}
+            className={`text-[11px] px-2.5 py-1 rounded-full border flex items-center gap-1 transition ${
+              connectMode ? "border-gold/60 bg-gold/15 text-gold" : "border-border bg-card/40 hover:border-primary"
+            }`}
+          >
+            <Link2 className="h-3 w-3" /> {connectMode ? "Connecting…" : "Connect topics"}
+          </button>
         </div>
       </div>
+      {connectMode && (
+        <div className="mb-2 text-[11px] text-muted-foreground">
+          {picked.length === 0 && "Tap any two nodes to discover an interdisciplinary bridge."}
+          {picked.length === 1 && <>Picked <b className="text-foreground">{picked[0]}</b> — pick one more.</>}
+          {picked.length === 2 && <>Bridging <b className="text-foreground">{picked[0]}</b> ↔ <b className="text-foreground">{picked[1]}</b>…</>}
+        </div>
+      )}
       <svg viewBox="0 0 600 420" className="w-full h-auto">
         <defs>
           <radialGradient id="star" cx="50%" cy="50%" r="50%">
