@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export async function callLearnAI<T = string>(mode: "lesson" | "knowledgeMap" | "forecast" | "quest", ctx: Record<string, any>): Promise<T> {
+export async function callLearnAI<T = string>(mode: "lesson" | "knowledgeMap" | "forecast" | "quest" | "bridge", ctx: Record<string, any>): Promise<T> {
   const { data, error } = await supabase.functions.invoke("learn-ai", { body: { mode, ctx } });
   if (error) throw new Error(error.message || "AI call failed");
   if ((data as any)?.error) throw new Error((data as any).error);
