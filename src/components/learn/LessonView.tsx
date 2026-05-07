@@ -2,7 +2,6 @@ import ReactMarkdown from "react-markdown";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { Languages, Loader2 } from "lucide-react";
-import { LANGUAGES } from "@/lib/learn-store";
 
 export function LessonView({
   markdown,
