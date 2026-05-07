@@ -40,6 +40,11 @@ Schema: { "mastery": number (0-100), "hoursToMastery": number, "nextHurdle": str
 
   quest: (ctx) => `Return ONLY JSON for a daily brain teaser logic puzzle for a ${ctx.grade} student on ${ctx.board} curriculum, in ${ctx.language}.
 Schema: { "question": string, "options": string[4], "correctIndex": number (0-3), "explanation": string }`,
+
+  bridge: (ctx) => `Return ONLY JSON explaining the interdisciplinary bridge between two concepts for a ${ctx.grade} student (${ctx.board}), in ${ctx.language}.
+Concept A: "${ctx.a}"
+Concept B: "${ctx.b}"
+Schema: { "title": string (catchy bridge name), "insight": string (2-3 sentences showing the surprising connection), "example": string (one concrete real-world example using both) }`,
 };
 
 serve(async (req) => {
