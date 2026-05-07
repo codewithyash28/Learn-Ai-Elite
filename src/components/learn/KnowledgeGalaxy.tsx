@@ -123,11 +123,19 @@ export function KnowledgeGalaxy({ data }: { data: GalaxyData }) {
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 + i * 0.05, type: "spring", stiffness: 180 }}
-            drag
+            drag={!connectMode}
             dragMomentum={false}
-            style={{ cursor: "grab" }}
+            style={{ cursor: connectMode ? "pointer" : "grab" }}
+            onClick={() => handleNodeClick(n.label)}
           >
-            <circle cx={n.x} cy={n.y} r={n.kind === "core" ? 28 : 18} fill={n.color} fillOpacity={n.kind === "core" ? 0.9 : 0.18} stroke={n.color} strokeWidth={1.5} />
+            <circle
+              cx={n.x} cy={n.y}
+              r={n.kind === "core" ? 28 : 18}
+              fill={n.color}
+              fillOpacity={picked.includes(n.label) ? 0.85 : n.kind === "core" ? 0.9 : 0.18}
+              stroke={picked.includes(n.label) ? "var(--color-gold)" : n.color}
+              strokeWidth={picked.includes(n.label) ? 3 : 1.5}
+            />
             {n.kind === "core" && <circle cx={n.x} cy={n.y} r={36} fill="none" stroke={n.color} strokeOpacity={0.4} className="animate-twinkle" />}
             <text
               x={n.x}
@@ -136,13 +144,47 @@ export function KnowledgeGalaxy({ data }: { data: GalaxyData }) {
               fontSize={n.kind === "core" ? 11 : 10}
               fontWeight={n.kind === "core" ? 700 : 500}
               fill={n.kind === "core" ? "var(--color-gold-foreground)" : "var(--color-foreground)"}
+              style={{ pointerEvents: "none" }}
             >
               {n.label.length > 22 ? n.label.slice(0, 20) + "…" : n.label}
             </text>
           </motion.g>
         ))}
       </svg>
-      <p className="text-[11px] text-muted-foreground mt-1 text-center">Drag any node to explore the universe ✨</p>
+      <p className="text-[11px] text-muted-foreground mt-1 text-center">
+        {connectMode ? "Click two nodes to bridge them ✨" : "Drag any node to explore the universe ✨"}
+      </p>
+      <AnimatePresence>
+        {(loadingBridge || bridge) && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="mt-3 rounded-xl border border-gold/30 bg-gold/5 p-3 relative"
+          >
+            <button
+              onClick={() => { setBridge(null); setPicked([]); }}
+              className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+            {loadingBridge ? (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Synthesizing the cross-curricular bridge…
+              </div>
+            ) : bridge && (
+              <>
+                <div className="text-[10px] uppercase tracking-wider text-gold mb-1 flex items-center gap-1">
+                  <Link2 className="h-3 w-3" /> Interdisciplinary bridge
+                </div>
+                <div className="font-semibold text-sm mb-1">{bridge.title}</div>
+                <p className="text-xs text-muted-foreground mb-2">{bridge.insight}</p>
+                <p className="text-xs italic border-l-2 border-gold/40 pl-2">{bridge.example}</p>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
