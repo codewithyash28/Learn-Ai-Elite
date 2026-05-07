@@ -148,7 +148,7 @@ function Dashboard() {
                 className="h-11 flex-1"
               />
               <Button
-                onClick={generate}
+                onClick={() => generate()}
                 disabled={!topic.trim() || loadingLesson}
                 className="h-11 bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-glow font-semibold"
               >
